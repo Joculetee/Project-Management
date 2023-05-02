@@ -5,7 +5,7 @@
 using namespace std;
 class Angajat {
 
-    private:
+    protected:
         char nume[50];
         char prenume[50];
         int varsta;
@@ -20,7 +20,7 @@ class Angajat {
             numarAngajati++;
         }
 
-        Angajat(char n[], char p[], int v, float s) {
+        Angajat(char n[], char p[], int v) {
             strcpy(nume, n);
             strcpy(prenume, p);
             varsta = v;
@@ -65,6 +65,68 @@ class Angajat {
             cout << "Nume: " << nume << " ";
             cout << "Prenume: " << prenume << " ";
             cout << "Varsta: " << varsta << endl<<endl;
+        }
+};
+class Manager : public Angajat {
+    protected:
+        int nivel;
+        bool esteManager;
+
+    public:
+        // constructor cu parametri, care apeleaza constructorul din clasa de baza folosind o lista de initializare
+        Manager(char n[], char p[], int v, int nivel, bool esteManager)
+            : Angajat(n, p, v), nivel(nivel), esteManager(esteManager) {}
+
+        // metoda protejata care modifica nivelul
+        void setNivel(int nivel) {
+            this->nivel = nivel;
+        }
+
+        // metoda de afisare a informatiilor despre manager
+        void afisare() {
+            Angajat::afisare();
+            cout << "Nivel: " << nivel << endl;
+            cout << "Este manager: " << esteManager << endl << endl;
+        }
+};
+class Junior : public Angajat {
+
+    protected:
+        int nivel;
+
+    public:
+        Junior() : Angajat() {
+            nivel = 0;
+        }
+
+        Junior(char n[], char p[], int v, int nv): Angajat(n, p, v) {
+            nivel = nv;
+        }
+
+        // Metoda pentru afisarea informatiilor despre junior
+        void afisare() {
+            Angajat::afisare();
+            cout << "Nivel: " << nivel << endl<<endl;
+        }
+};
+class Senior : public Angajat {
+
+    protected:
+        int nivel;
+
+    public:
+        Senior() : Angajat() {
+            nivel = 0;
+        }
+
+        Senior(char n[], char p[], int v, int nv) : Angajat(n, p, v) {
+            nivel = nv;
+        }
+
+        // Metoda pentru afisarea informatiilor despre senior
+        void afisare() {
+            Angajat::afisare();
+            cout << "Nivel: " << nivel << endl<<endl;
         }
 };
 class Task {
@@ -337,7 +399,7 @@ int main() {
     // Crearea unui obiect Angajat
         char nume[] = "Popescu";
         char prenume[] = "Ion";
-        Angajat angajat1(nume, prenume, 30, 2000.0);
+        Angajat angajat1(nume, prenume, 30);
 
     // Afisarea informatiilor despre angajat
         angajat1.afisare();
@@ -357,9 +419,9 @@ int main() {
     // Afisarea noilor informatii despre angajat
         angajat1.afisare();
     // Creare Angajati
-        Angajat a1("Popescu", "Ion", 28, 3000);
-        Angajat a2("Ionescu", "Maria", 35, 4500);
-        Angajat a3("Mihai", "Andrei", 23, 2000);
+        Angajat a1("Popescu", "Ion", 28);
+        Angajat a2("Ionescu", "Maria", 35);
+        Angajat a3("Mihai", "Andrei", 23);
     // afisare numar total angajati
         cout << "Numar total angajati: " << Angajat::getNumarAngajati() << endl;
     //afisare motto
@@ -478,9 +540,18 @@ int main() {
         functie6();
     }
     catch (EroarePersonalizata& e) {
-        cout << "Exceptie prinsa in main: " << e.what() << endl;
+        cout << "Exceptie prinsa in main: " << e.what() << endl<<endl;
     }
+    cout<<"[-------------------------------------]"<<endl;
+    cout<<"[-----Clasa-Junior-Senior-Manager-----]"<<endl;
+    cout<<"[-------------------------------------]"<<endl<<endl;
 
+    Manager manager1("Ionescu", "Maria", 40, 3, true);
+    Junior junior1("Georgescu", "Andrei", 25, 1);
+    Senior senior1("Stoica", "Cristina", 30, 2);
+    manager1.afisare();
+    junior1.afisare();
+    senior1.afisare();
 
     return 0;
 
