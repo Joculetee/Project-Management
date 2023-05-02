@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <exception>
+#include <string>
 using namespace std;
 class Angajat {
 
@@ -7,6 +9,7 @@ class Angajat {
         char nume[50];
         char prenume[50];
         int varsta;
+        static int numarAngajati;
 
     public:
         // Constructori
@@ -14,14 +17,23 @@ class Angajat {
             strcpy(nume, "");
             strcpy(prenume, "");
             varsta = 0;
+            numarAngajati++;
         }
 
         Angajat(char n[], char p[], int v, float s) {
             strcpy(nume, n);
             strcpy(prenume, p);
             varsta = v;
+            numarAngajati++;
         }
 
+        // metoda statica pentru returnarea numarului total de angajati
+        static int getNumarAngajati() {
+            return numarAngajati;
+        }
+        static void MottoAngajare(string mesaj) {
+            cout << mesaj << endl << endl;
+        }
         // Metodele de setare a valorilor membrilor
         void setNume(char n[]) {
             strcpy(nume, n);
@@ -268,6 +280,55 @@ class TermenLimita {
         cout << "Termen limită: " << data << " " << ora << endl;
     }
 };
+class EroarePersonalizata : public exception {
+public:
+const char* what() const throw() {
+return "Aceasta este o eroare personalizata";
+}
+};
+// Functia 1 arunca o exceptie de tip runtime_error cu un mesaj specificat
+void functie1() {
+    throw runtime_error("Aceasta este o eroare de timp de executie");
+}
+
+// Functia 2 primeste un numar si arunca o exceptie de tip out_of_range daca numarul este negativ
+void functie2(int numar) {
+if (numar < 0) {
+    throw out_of_range("Numarul trebuie sa fie pozitiv");
+}
+}
+
+// Functia 3 arunca o exceptie de tip logic_error cu un mesaj specificat
+void functie3() {
+    throw logic_error("Aceasta este o eroare logica");
+}
+
+// Functia 4 arunca o exceptie de tip EroarePersonalizata
+void functie4() {
+    throw EroarePersonalizata();
+}
+
+// Functia 5 contine un bloc try-catch si apeleaza functia 1, prinzand si afisand mesajul unei exceptii daca aceasta apare
+void functie5() {
+    try {
+        functie1();
+    }
+    catch (exception& e) {
+        cout << "Exceptie prinsa in functie5: " << e.what() << endl;
+    }
+}
+
+// Functia 6 contine un bloc try-catch si apeleaza functia 3, prinzand si afisand mesajul unei exceptii daca aceasta apare, apoi arunca o exceptie de tip EroarePersonalizata
+void functie6() {
+    try {
+        functie3();
+    }
+    catch (exception& e) {
+        cout << "Exceptie prinsa in functie6: " << e.what() << endl;
+    throw EroarePersonalizata();
+    }
+}
+int Angajat::numarAngajati = 0;
 int main() {
     cout<<"[-------------------------------------]"<<endl;
     cout<<"[----------Clasa-Angajat--------------]"<<endl;
@@ -295,6 +356,14 @@ int main() {
 
     // Afisarea noilor informatii despre angajat
         angajat1.afisare();
+    // Creare Angajati
+        Angajat a1("Popescu", "Ion", 28, 3000);
+        Angajat a2("Ionescu", "Maria", 35, 4500);
+        Angajat a3("Mihai", "Andrei", 23, 2000);
+    // afisare numar total angajati
+        cout << "Numar total angajati: " << Angajat::getNumarAngajati() << endl;
+    //afisare motto
+        Angajat::MottoAngajare("Veniti in echipa noastra de game-development!");
 
 
     cout<<"[-------------------------------------]"<<endl;
@@ -318,12 +387,6 @@ int main() {
     cout<<"[-------------------------------------]"<<endl;
     cout<<"[----------Clasa-Echipa---------------]"<<endl;
     cout<<"[-------------------------------------]"<<endl<<endl;
-
-
-    // Creare Angajati
-        Angajat a1("Popescu", "Ion", 28, 3000);
-        Angajat a2("Ionescu", "Maria", 35, 4500);
-        Angajat a3("Mihai", "Andrei", 23, 2000);
 
     // Creare obiect Echipa si adaugare angajati
         Echipa Alpha("Alpha");
@@ -378,6 +441,46 @@ int main() {
 
     //afisare deadline actualizat
     d1.afisare();
+
+    cout<<"[-------------------------------------]"<<endl;
+    cout<<"[----------Exceptia-Custom------------]"<<endl;
+    cout<<"[-------------------------------------]"<<endl<<endl;
+
+    try {
+        functie1();
+    }
+    catch (runtime_error& e) {
+        cout << "Exceptie prinsa in main: " << e.what() << endl;
+    }
+
+    try {
+        functie2(-1);
+    }
+    catch (out_of_range& e) {
+        cout << "Exceptie prinsa in main: " << e.what() << endl;
+    }
+
+    try {
+        functie4();
+    }
+    catch (EroarePersonalizata& e) {
+        cout << "Exceptie prinsa in main: " << e.what() << endl;
+    }
+
+    try {
+        functie5();
+    }
+    catch (exception& e) {
+        cout << "Exceptie prinsa in main: " << e.what() << endl;
+    }
+
+    try {
+        functie6();
+    }
+    catch (EroarePersonalizata& e) {
+        cout << "Exceptie prinsa in main: " << e.what() << endl;
+    }
+
 
     return 0;
 
