@@ -2,7 +2,10 @@
 #include <cstring>
 #include <exception>
 #include <string>
+#include <vector>
+#include <algorithm>
 using namespace std;
+
 class Angajat {
 
     protected:
@@ -210,10 +213,12 @@ class Echipa {
             nrAngajati = 0;
             nrTasks = 0;
         }
-
+        string getNume() const {
+            return nume;
+        }
         // Metoda pentru afisarea numelui echipei
-        void afisareNume() {
-            cout << "Nume echipa: " << nume << endl<< endl;
+        void afisareNume() const {
+            cout << "Nume echipa: " << nume << endl;
         }
 
         // Metode pentru adaugarea si stergerea angajatilor din echipa
@@ -272,6 +277,75 @@ class Echipa {
             cout << "Nu s-a gasit niciun task cu id-ul " << taskId << " in echipa!" << endl;
         }
 
+};
+ostream& operator<<(ostream& os, const Echipa& echipa) {
+    os << echipa.getNume();
+    return os;
+}
+class Observer {
+public:
+    virtual void notificare(const string& numeEchipa) = 0;
+};
+template<typename T>
+class Proiect {
+private:
+    string nume;
+    vector<T> echipe;
+    vector<Observer*> observatori;
+
+public:
+    Proiect(const string& n) : nume(n) {}
+    void notificaObservatori(const string& numeEchipa) {
+        for (auto observator : observatori) {
+            observator->notificare(numeEchipa);
+        }
+    }
+    void inregistreazaObservator(Observer* observator) {
+        observatori.push_back(observator);
+    }
+    void adaugaEchipa(const T& echipa) {
+        echipe.push_back(echipa);
+        notificaObservatori(echipa);
+    }
+
+    void afisareEchipe() const {
+        cout << "Echipele proiectului " << nume << " sunt:" << endl;
+        for (const auto& echipa : echipe) {
+            cout << echipa << endl;
+        }
+    }
+
+    vector<T>& getEchipe() {
+        return echipe;
+    }
+};
+
+class EchipaObservator : public Observer {
+public:
+    void notificare(const string& numeEchipa) override {
+        cout << "Echipa " << numeEchipa << " a fost adaugata sau stearsa din proiect." << endl;
+    }
+};
+// Specializare pentru clasa Echipa
+template<>
+class Proiect<Echipa> {
+private:
+    string nume;
+    vector<Echipa> echipe;
+
+public:
+    Proiect(const string& n) : nume(n) {}
+
+    void adaugaEchipa(const Echipa& echipa) {
+        echipe.push_back(echipa);
+    }
+
+    void afisareEchipe() const {
+        cout << "Echipele proiectului " << nume << " sunt:" << endl;
+        for (const auto& echipa : echipe) {
+            cout << echipa << endl;
+        }
+    }
 };
 class Buget {
 private:
@@ -452,6 +526,7 @@ int main() {
 
     // Creare obiect Echipa si adaugare angajati
         Echipa Alpha("Alpha");
+        Echipa Beta("Beta");
         Alpha.adaugaAngajat(a1);
         Alpha.adaugaAngajat(a2);
         Alpha.adaugaAngajat(a3);
@@ -552,6 +627,43 @@ int main() {
     manager1.afisare();
     junior1.afisare();
     senior1.afisare();
+    cout<<"[-------------------------------------]"<<endl;
+    cout<<"[------------Clasa-Proiect------------]"<<endl;
+    cout<<"[-------------------------------------]"<<endl<<endl;
+
+    // Exemplu utilizare pentru clasa Proiect cu tip de date generic
+    Proiect<string> proiect1("Proiect 1");
+    // Crearea observer-ului
+    EchipaObservator observer;
+
+    // Adăugarea observer-ului la subiect
+    proiect1.inregistreazaObservator(&observer);
+    proiect1.adaugaEchipa("Echipa A");
+    proiect1.adaugaEchipa("Echipa B");
+    proiect1.afisareEchipe();
+
+
+    // Exemplu utilizare pentru clasa Proiect cu specializare pentru Echipa
+    Proiect<Echipa> proiect2("Proiect 2");
+    proiect2.adaugaEchipa(Alpha);
+    proiect2.adaugaEchipa(Beta);
+    proiect2.afisareEchipe();
+
+    vector<string>& echipe = proiect1.getEchipe();
+
+    // Utilizarea functiei utilitare sort din biblioteca standard
+    sort(echipe.begin(), echipe.end());
+
+    proiect1.afisareEchipe();
+
+    // Utilizarea functiei utilitare reverse din biblioteca standard
+    reverse(echipe.begin(), echipe.end());
+
+    proiect1.afisareEchipe();
+
+    cout << endl;
+
+
 
     return 0;
 
